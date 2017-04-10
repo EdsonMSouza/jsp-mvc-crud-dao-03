@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Controle de Alunos</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="views/css/estilo.css">
+    </head>
+    <body>
+        <h1>Pesquisar aluno</h1>
+        <p>Digite: Nome completo ou parte dele, RA ou Curso</p>
+        <form name="pesquisa" action="Controle" method="post">
+            <input type="text" name="pesquisa" class="input"><br>
+            <input type="submit" name="btPesquisar" value="Pesquisar" class="botao">
+            <input type="hidden" name="flag" value="pesquisar">
+            <input type="button" name="btVoltar" onclick="history.go(-1);" value="Voltar" class="botao">
+        </form>
+    </body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Controle de Alunos</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="views/css/estilo.css">
+    </head>
+    <body>
+        <h1>Cadastro de Aluno</h1>
+        <form name="cadastro" action="Controle" method="post">
+            <label>Nome:</label><input type="text" name="nomeAluno" class="input"><br>
+
+            <label>Curso:</label>
+            <select name="cursoAluno">
+                <option value="">Selecione um Curso</option>
+                <option value="SI">Sistemas de Informação</option>
+                <option value="TADS">Tecnologia em Análise e Desenvolvimento de Sistemas</option>
+                <option value="TSIN">Tecnologia em Sistemas para Internet</option>
+                <option value="TBD">Tecnologia em Banco de Dados</option>
+                <option value="TGTI">Tecnologia em Gestão da Tecnologia da Informação</option>
+            </select><br>
+
+            <label>Disciplina:</label>
+            <select name="disciplinaAluno">
+                <option value="">Selecione uma Disciplina</option>
+                <option value="Aplicações Web">Aplicações WEB</option>
+                <option value="Algoritmos e Lógica de Programação">Algoritmos e Lógica de Programação</option>
+                <option value="Gerenciamento de Projetos">Gerenciamento de Projetos</option>
+                <option value="Sistemas Móveis">Sistemas Móveis</option>
+                <option value="Estrutura de Dados">Estrutura de Dados</option>
+            </select><br>
+
+            <label>E-mail:</label><input type="text" name="emailAluno" class="input"><br><br>
+
+            <label>&nbsp;</label><input type="submit" name="btCadastrar" value="Cadastrar" class="botao">
+
+            <input type="hidden" name="flag" value="cadastrar">
+            <input type="button" name="btVoltar" onclick="history.go(-1);" value="Voltar" class="botao">
+        </form>
+    </body>
+</html>
