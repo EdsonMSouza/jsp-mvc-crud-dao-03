@@ -43,7 +43,8 @@ public class Controle extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, SQLException {
         /**
-         * Configuração do código de página
+         * Configuração do código de página para mostrar os caracteres
+         * corretamente
          */
         response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
@@ -63,41 +64,54 @@ public class Controle extends HttpServlet {
                         forward(request, response);
             }
 
+            /**
+             * Declaração das variáveis para os objetos e para receber os
+             * valores enviados pelos formulários
+             */
+            // Objetos
+            Aluno aluno = new Aluno();
+            AlunoDAO alunoDAO = new AlunoDAO();
+            ArrayList<Aluno> listaAluno = new ArrayList();
+            List<Aluno> alunos;
+            List<Aluno> pesquisa;
+            List<Aluno> alunoAlteraDAO;
+            Map<String, String> campos;
+
+            // Variáveis dos formulários
+            String nome;
+            String curso;
+            String disciplina;
+            String email;
+
+            // Variáveis para tratamento das mensagens de erro
+            String tituloErro = "";
+            String erro = "";
+
             // Verifica qual ação deve ser tomada
             switch (flag) {
                 case "cadastrar":
+                    //Recupera os valores enviados pelo formulário
+                    nome = request.getParameter("nomeAluno");
+                    curso = request.getParameter("cursoAluno");
+                    disciplina = request.getParameter("disciplinaAluno");
+                    email = request.getParameter("emailAluno");
 
-                    /**
-                     * Declara as variaveis string para receber os dados
-                     * postados
-                     */
-                    String nome = request.getParameter("nomeAluno");
-                    String curso = request.getParameter("cursoAluno");
-                    String disciplina = request.getParameter("disciplinaAluno");
-                    String email = request.getParameter("emailAluno");
-
-                    //Cria um objeto do tipo Aluno e atribui os dados
-                    Aluno aluno = new Aluno();
+                    // Cria o objeto e e atribui os dados recebidos
+                    aluno = new Aluno();
                     aluno.setNome(nome);
                     aluno.setCurso(curso);
                     aluno.setDisciplina(disciplina);
                     aluno.setEmail(email);
 
+                    // Cria um objeto para receber os campos
+                    campos = new HashMap<>();
+
                     // Verifica o preenchimento dos campos
-                    Map<String, String> campos = new HashMap<>();
-
-                    // Valida os campos na classe AlunoDAO
                     campos = aluno.verificaDados();
-
-                    // Variáveis para armazenar o(s) erro(s)
-                    String tituloErro = "";
-                    String erro = "";
 
                     // Percorre a lista (objetos - campos) em busca dos erros
                     for (String key : campos.keySet()) {
-                        String value = campos.get(key);
                         if (campos.get(key).equals("")) {
-
                             // monta a mensagem de erro
                             tituloErro = "<h1>Campo (s) não preenchido (s)!</h1>";
                             erro = erro + "&rarr; " + String.valueOf(key) + "<br>";
@@ -116,20 +130,20 @@ public class Controle extends HttpServlet {
                     aluno.setRa(new GeraRA().getRa());
 
                     /**
-                     * Repassa os valores dos atributos para o objeto que irá
-                     * manipular os dados e gravar no banco
+                     * Repassa os valores dos atributos para o objeto DAO que
+                     * irá manipular os dados e gravar no banco
                      */
-                    AlunoDAO alunoDAO = new AlunoDAO();
+                    alunoDAO = new AlunoDAO();
                     alunoDAO.inserir(aluno);
 
                     /**
-                     * Cria uma lista e coloca o aluno para ser repassado para a
-                     * View/mensagem
+                     * Cria uma lista e coloca o objeto aluno para ser repassado
+                     * para a views/mensagem.jsp
                      */
-                    ArrayList<Aluno> listaAluno = new ArrayList<>();
+                    listaAluno = new ArrayList<>();
                     listaAluno.add(aluno);
 
-                    // Cria uma variável com o aluno para ser utilizado na View
+                    // Cria um atributo com o aluno para ser utilizado na View
                     request.setAttribute("listaAluno", listaAluno);
 
                     // Redireciona para a View
@@ -139,11 +153,12 @@ public class Controle extends HttpServlet {
 
                 case "listar":
                     // Busca no model os dados
-                    AlunoDAO alunosDAO = new AlunoDAO();
+                    alunoDAO = new AlunoDAO();
 
                     // Coloca todos os alunos em uma lista
-                    List<Aluno> alunos = alunosDAO.Listar();
+                    alunos = alunoDAO.listar();
 
+                    // Cria um atributo com o aluno para ser utilizado na View
                     request.setAttribute("listaAlunos", alunos);
 
                     // Redireciona para a View
@@ -153,22 +168,25 @@ public class Controle extends HttpServlet {
                     break;
 
                 case "pesquisar":
-
                     // Cria um novo aluno
                     aluno = new Aluno();
 
-                    // Atribui os valores recuperados do formulário
+                    /**
+                     * Atribui os valores recuperados do formulário O parâmetro
+                     * utilizado "pesquisa" é igual para os três campos, pois
+                     * está sendo utilizado o LIKE na instrução SQL do DAO
+                     */
                     aluno.setNome(request.getParameter("pesquisa"));
                     aluno.setRa(request.getParameter("pesquisa"));
                     aluno.setCurso(request.getParameter("pesquisa"));
 
-                    // Busca no model os dados
-                    alunosDAO = new AlunoDAO();
+                    // Busca no model (DAO) os dados
+                    alunoDAO = new AlunoDAO();
 
                     // Coloca todos os alunos em uma lista
-                    // Coloca todos os alunos em uma lista
-                    List<Aluno> pesquisa = alunosDAO.pesquisar(aluno);
+                    pesquisa = alunoDAO.pesquisar(aluno);
 
+                    // Cria um atributo com o aluno para ser utilizado na View
                     request.setAttribute("listaAlunos", pesquisa);
 
                     // Redireciona para a View
@@ -181,15 +199,16 @@ public class Controle extends HttpServlet {
                     /**
                      * Cria o objeto aluno e atribui o RA para pesquisa
                      */
-                    Aluno alunoPesquisa = new Aluno();
-                    alunoPesquisa.setRa(request.getParameter("ra"));
+                    aluno = new Aluno();
+                    aluno.setRa(request.getParameter("ra"));
 
                     // Busca no model os dados
-                    AlunoDAO alunoAltera = new AlunoDAO();
+                    alunoDAO = new AlunoDAO();
 
                     // Coloca todos os alunos em uma lista
-                    List<Aluno> alunoAlteraDAO = alunoAltera.pesquisar(alunoPesquisa);
-
+                    alunoAlteraDAO = alunoDAO.pesquisar(aluno);
+                    
+                    // Cria um atributo com o aluno para ser utilizado na View
                     request.setAttribute("listaAlunos", alunoAlteraDAO);
 
                     // Redireciona para a View
@@ -197,7 +216,7 @@ public class Controle extends HttpServlet {
                             forward(request, response);
 
                     break;
-                    
+
                 case "salvar":
                     // Redireciona para a página de erro
                     tituloErro = "<h1>Aviso!</h1>";

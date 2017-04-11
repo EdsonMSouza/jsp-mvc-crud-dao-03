@@ -80,7 +80,7 @@ public class AlunoDAO {
      *
      * @param aluno
      */
-    public void atualizar(Aluno aluno) {
+    public void salvar(Aluno aluno) {
         // Não implementado
     }
 
@@ -129,11 +129,11 @@ public class AlunoDAO {
     }
 
     /**
-     * realiza a listagem de TODOS os registros existentes no banco de dados
+     * Realiza a listagem de TODOS os registros existentes no banco de dados
      *
      * @return Aluno
      */
-    public List<Aluno> Listar() {
+    public List<Aluno> listar() {
         List<Aluno> alunos = new ArrayList<>();
         try {
             String sql = "SELECT * FROM aluno ORDER BY nome";

@@ -9,8 +9,8 @@
         <link rel="stylesheet" type="text/css" href="views/css/estilo.css">
     </head>
     <body>
-        <h1>Cadastro de Aluno</h1><br>
-        <form name="cadastro" action="Controle" method="post">
+        <h1>Editar Registro</h1><br>
+        <form name="cadastro" action="Controle" method="POST">
             <c:forEach var="aluno" items="${listaAlunos}">
                 <label>Nome:</label><input type="text" name="nomeAluno" class="input" value="${aluno.nome}"><br>
                 <label>Curso:</label><input type="text" name="cursoAluno" class="input" value="${aluno.curso}"><br>
