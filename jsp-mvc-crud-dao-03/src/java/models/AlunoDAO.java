@@ -71,7 +71,7 @@ public class AlunoDAO {
 
         } catch (SQLException ex) {
             // Lança um erro novo personalizado 
-            throw new RuntimeException("Erro ao inserir aluno", ex);
+            status = "Erro ao inserir o aluno";
         }
     }
 
@@ -81,7 +81,36 @@ public class AlunoDAO {
      * @param aluno
      */
     public void salvar(Aluno aluno) {
-        // Não implementado
+        try {
+            // Declaração da variável para a instrução SQL
+            String sql = "UPDATE aluno SET nome=?, curso=?, disciplina=?, email=? WHERE ra=?";
+
+            // Atribui os valores ao objeto ps
+            try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+                // seta os valores
+                ps.setString(1, aluno.getNome());
+                ps.setString(2, aluno.getCurso());
+                ps.setString(3, aluno.getDisciplina());
+                ps.setString(4, aluno.getEmail());
+                ps.setString(5, aluno.getRa());
+
+                // Executa o sql (executeUpdate)
+                ps.executeUpdate();
+
+                // Fecha o ps
+                ps.close();
+            }
+
+            // Fecha a conexão
+            conexao.close();
+
+            // Retorna o status da inserção
+            status = "Atualizado com Sucesso!";
+
+        } catch (SQLException ex) {
+            // Lança um erro novo personalizado 
+            status = "Erro ao atualizar os dados do aluno";
+        }
     }
 
     /**
@@ -90,7 +119,32 @@ public class AlunoDAO {
      * @param aluno
      */
     public void excluir(Aluno aluno) {
-        // Não implementado
+        try {
+            // Declaração da variável para a instrução SQL
+            String sql = "DELETE FROM aluno WHERE ra=?";
+
+            // Atribui os valores ao objeto ps
+            try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+                // seta os valores
+                ps.setString(1, aluno.getRa());
+
+                // Executa o sql (executeUpdate)
+                ps.executeUpdate();
+
+                // Fecha o ps
+                ps.close();
+            }
+
+            // Fecha a conexão
+            conexao.close();
+
+            // Retorna o status da inserção
+            status = "Excluído com Sucesso!";
+
+        } catch (SQLException ex) {
+            // Lança um erro novo personalizado 
+            status = "Erro ao excluir o aluno";
+        }
     }
 
     /**
@@ -123,8 +177,7 @@ public class AlunoDAO {
             return alunos;
 
         } catch (SQLException ex) {
-            Logger.getLogger(AlunoDAO.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException("Falha ao listar os alunos em JDBCAluno", ex);
+            throw new RuntimeException("Falha ao listar os alunos.", ex);
         }
     }
 
@@ -155,7 +208,7 @@ public class AlunoDAO {
 
         } catch (SQLException ex) {
             Logger.getLogger(AlunoDAO.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException("Falha ao listar os alunos em JDBCAluno", ex);
+            throw new RuntimeException("Falha ao listar os alunos.", ex);
         }
     }
 

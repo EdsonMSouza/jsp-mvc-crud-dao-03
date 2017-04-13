@@ -78,10 +78,12 @@ public class Controle extends HttpServlet {
             Map<String, String> campos;
 
             // Variáveis dos formulários
+            String ra;
             String nome;
             String curso;
             String disciplina;
             String email;
+            String status;
 
             // Variáveis para tratamento das mensagens de erro
             String tituloErro = "";
@@ -136,15 +138,8 @@ public class Controle extends HttpServlet {
                     alunoDAO = new AlunoDAO();
                     alunoDAO.inserir(aluno);
 
-                    /**
-                     * Cria uma lista e coloca o objeto aluno para ser repassado
-                     * para a views/mensagem.jsp
-                     */
-                    listaAluno = new ArrayList<>();
-                    listaAluno.add(aluno);
-
-                    // Cria um atributo com o aluno para ser utilizado na View
-                    request.setAttribute("listaAluno", listaAluno);
+                    // Cria um atributo para informar sobre  a inclusão
+                    request.setAttribute("mensagem", alunoDAO.toString());
 
                     // Redireciona para a View
                     request.getRequestDispatcher("views/mensagem.jsp").
@@ -158,12 +153,22 @@ public class Controle extends HttpServlet {
                     // Coloca todos os alunos em uma lista
                     alunos = alunoDAO.listar();
 
-                    // Cria um atributo com o aluno para ser utilizado na View
-                    request.setAttribute("listaAlunos", alunos);
+                    // se não for encontrado nenhum registro, retorna a mensagem
+                    if (alunos.size() == 0) {
+                        // Cria um atributo com o aluno para ser utilizado na View
+                        request.setAttribute("mensagem", "Não há registros para serem listados");
 
-                    // Redireciona para a View
-                    request.getRequestDispatcher("views/lista_alunos.jsp").
-                            forward(request, response);
+                        // Redireciona para a View
+                        request.getRequestDispatcher("views/mensagem.jsp").
+                                forward(request, response);
+                    } else {
+                        // Cria um atributo com o aluno para ser utilizado na View
+                        request.setAttribute("listaAlunos", alunos);
+
+                        // Redireciona para a View
+                        request.getRequestDispatcher("views/lista_alunos.jsp").
+                                forward(request, response);
+                    }
 
                     break;
 
@@ -186,12 +191,22 @@ public class Controle extends HttpServlet {
                     // Coloca todos os alunos em uma lista
                     pesquisa = alunoDAO.pesquisar(aluno);
 
-                    // Cria um atributo com o aluno para ser utilizado na View
-                    request.setAttribute("listaAlunos", pesquisa);
+                    // se não for encontrado nenhum registro, retorna a mensagem
+                    if (pesquisa.size() == 0) {
+                        // Cria um atributo com o aluno para ser utilizado na View
+                        request.setAttribute("mensagem", "Não há registros para serem listados");
 
-                    // Redireciona para a View
-                    request.getRequestDispatcher("views/lista_alunos.jsp").
-                            forward(request, response);
+                        // Redireciona para a View
+                        request.getRequestDispatcher("views/mensagem.jsp").
+                                forward(request, response);
+                    } else {
+                        // Cria um atributo com o aluno para ser utilizado na View
+                        request.setAttribute("listaAlunos", pesquisa);
+
+                        // Redireciona para a View
+                        request.getRequestDispatcher("views/lista_alunos.jsp").
+                                forward(request, response);
+                    }
 
                     break;
                 case "editar":
@@ -207,7 +222,7 @@ public class Controle extends HttpServlet {
 
                     // Coloca todos os alunos em uma lista
                     alunoAlteraDAO = alunoDAO.pesquisar(aluno);
-                    
+
                     // Cria um atributo com o aluno para ser utilizado na View
                     request.setAttribute("listaAlunos", alunoAlteraDAO);
 
@@ -218,21 +233,80 @@ public class Controle extends HttpServlet {
                     break;
 
                 case "salvar":
-                    // Redireciona para a página de erro
-                    tituloErro = "<h1>Aviso!</h1>";
-                    erro = "Metodo [<strong>salvar</strong>] não implementado";
-                    request.setAttribute("mensagem", tituloErro + erro);
-                    request.getRequestDispatcher("views/erro.jsp").
+                    //Recupera os valores enviados pelo formulário
+                    ra = request.getParameter("ra");
+                    nome = request.getParameter("nomeAluno");
+                    curso = request.getParameter("cursoAluno");
+                    disciplina = request.getParameter("disciplinaAluno");
+                    email = request.getParameter("emailAluno");
+
+                    // Cria o objeto e e atribui os dados recebidos
+                    aluno = new Aluno();
+                    aluno.setRa(ra);
+                    aluno.setNome(nome);
+                    aluno.setCurso(curso);
+                    aluno.setDisciplina(disciplina);
+                    aluno.setEmail(email);
+
+                    // Cria um objeto para receber os campos, exceto o RA que é o identificador
+                    campos = new HashMap<>();
+
+                    // Verifica o preenchimento dos campos
+                    campos = aluno.verificaDados();
+
+                    // Percorre a lista (objetos - campos) em busca dos erros
+                    for (String key : campos.keySet()) {
+                        if (campos.get(key).equals("")) {
+                            // monta a mensagem de erro
+                            tituloErro = "<h1>Campo (s) não preenchido (s)!</h1>";
+                            erro = erro + "&rarr; " + String.valueOf(key) + "<br>";
+                        }
+                    }
+
+                    // Se ocorreram erros, envia para página de erro
+                    if (!erro.isEmpty()) {
+                        request.setAttribute("mensagem", tituloErro + erro);
+                        request.getRequestDispatcher("views/erro.jsp").
+                                forward(request, response);
+                        break;
+                    }
+
+                    /**
+                     * Repassa os valores dos atributos para o objeto DAO que
+                     * irá manipular os dados e gravar no banco
+                     */
+                    alunoDAO = new AlunoDAO();
+                    alunoDAO.salvar(aluno);
+
+                    // Cria um atributo para informar sobre a atualização
+                    request.setAttribute("mensagem", alunoDAO.toString());
+
+                    // Redireciona para a View
+                    request.getRequestDispatcher("views/mensagem.jsp").
                             forward(request, response);
+
                     break;
 
                 case "excluir":
-                    // Redireciona para a página de erro
-                    tituloErro = "<h1>Aviso!</h1>";
-                    erro = "Metodo [<strong>excluir</strong>] não implementado";
-                    request.setAttribute("mensagem", tituloErro + erro);
-                    request.getRequestDispatcher("views/erro.jsp").
+                     /**
+                     * Cria o objeto aluno e atribui o RA para pesquisa
+                     */
+                    aluno = new Aluno();
+                    aluno.setRa(request.getParameter("ra"));
+
+                    // Busca no model os dados
+                    alunoDAO = new AlunoDAO();
+
+                    // Coloca todos os alunos em uma lista
+                    alunoDAO.excluir(aluno);
+
+                    // Cria um atributo com o aluno para ser utilizado na View
+                    request.setAttribute("mensagem", alunoDAO.toString());
+
+                    // Redireciona para a View
+                    request.getRequestDispatcher("views/mensagem.jsp").
                             forward(request, response);
+
                     break;
             }
         }
